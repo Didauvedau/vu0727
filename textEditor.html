@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style.css" />
     <title>Document</title>
   </head>
   <body>
@@ -21,5 +21,136 @@
       <h4>First Textarea</h4>
       <textarea name="area1" cols="40" rows="5"></textarea><br />
     </div>
+
+    <button class="btn btn-primary" id="windowtoggle">
+      click
+    </button>
+
+    <div class="window" id="window">
+      <div class="window-bar">
+        <div>Window Title</div>
+        <span class="window-close">
+          <svg
+            viewport="0 0 12 12"
+            version="1.1"
+            width="16"
+            height="16"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <line
+              x1="1"
+              y1="11"
+              x2="11"
+              y2="1"
+              stroke="black"
+              strokeWidth="2"
+            />
+            <line
+              x1="1"
+              y1="1"
+              x2="11"
+              y2="11"
+              stroke="black"
+              strokeWidth="2"
+            />
+          </svg>
+        </span>
+      </div>
+      <div class="window-body">Window body</div>
+    </div>
+
+    <script type="text/javascript">
+      var state = {
+        isDragging: false,
+        isHidden: true,
+        xDiff: 0,
+        yDiff: 0,
+        x: 50,
+        y: 50,
+      };
+
+      // hehe: http://youmightnotneedjquery.com/
+      function ready(fn) {
+        if (
+          document.attachEvent
+            ? document.readyState === "complete"
+            : document.readyState !== "loading"
+        ) {
+          fn();
+        } else {
+          document.addEventListener("DOMContentLoaded", fn);
+        }
+      }
+
+      function renderWindow(w, myState) {
+        if (state.isHidden) {
+          w.style.display = "none";
+        } else {
+          w.style.display = "";
+        }
+
+        w.style.transform =
+          "translate(" + myState.x + "px, " + myState.y + "px)";
+      }
+
+      function clampX(n) {
+        return Math.min(
+          Math.max(n, 0),
+          // container width - window width
+          500 - 400
+        );
+      }
+
+      function clampY(n) {
+        return Math.min(Math.max(n, 0), 800);
+      }
+
+      function onMouseMove(e) {
+        if (state.isDragging) {
+          state.x = clampX(e.pageX - state.xDiff);
+          state.y = clampY(e.pageY - state.yDiff);
+        }
+
+        // Update window position
+        var w = document.getElementById("window");
+        renderWindow(w, state);
+      }
+
+      function onMouseDown(e) {
+        state.isDragging = true;
+        state.xDiff = e.pageX - state.x;
+        state.yDiff = e.pageY - state.y;
+      }
+
+      function onMouseUp() {
+        state.isDragging = false;
+      }
+
+      function closeWindow() {
+        state.isHidden = true;
+
+        var w = document.getElementById("window");
+        renderWindow(w, state);
+      }
+
+      ready(function () {
+        var w = document.getElementById("window");
+        renderWindow(w, state);
+
+        var windowBar = document.querySelectorAll(".window-bar");
+        windowBar[0].addEventListener("mousedown", onMouseDown);
+        document.addEventListener("mousemove", onMouseMove);
+        document.addEventListener("mouseup", onMouseUp);
+
+        var closeButton = document.querySelectorAll(".window-close");
+        closeButton[0].addEventListener("click", closeWindow);
+
+        var toggleButton = document.getElementById("windowtoggle");
+        toggleButton.addEventListener("click", function () {
+          state.isHidden = !state.isHidden;
+          renderWindow(w, state);
+        });
+      });
+    </script>
   </body>
 </html>
